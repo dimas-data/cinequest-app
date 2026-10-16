@@ -67,6 +67,13 @@ The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from Ka
 
 ---
 
+## Process Automation (RPA)
+- **Engine:** Power Automate Desktop (PAD)
+- **Workflow:** `CineQuest-Catalog-Automation`
+- **Function:** Automates catalog status checks, execution logging, and UI analytics verification for the CineQuest desktop engine.
+
+---
+
 ## Execution Steps
 
 ### Part 1: Installation
