@@ -4,7 +4,7 @@
 
 ---
 
-# Project Overview
+## Project Overview
 
 Finding a movie to watch in a 4,000-title dataset shouldn't mean scrolling through a spreadsheet. **Cinequest** is a desktop movie catalog where users create accounts, browse and search a movie dataset, curate personal watch lists, and see what other users are adding most often.
 
@@ -35,12 +35,12 @@ It was built as an academic project to show how classic data structures solve re
 
 ## Data Preprocessing
 
-The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from Kaggle). On startup the pipeline:
+The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from [Kaggle](https://www.kaggle.com/code/yousefsaeedian/movies-dataset-visualization/input)). On startup, the pipeline:
 
-1. Loads the CSV with Pandas using UTF-8 encoding.
+1. Loads the CSV with Pandas using UTF-8 encoding, resolving the file location dynamically with an absolute path (`pathlib`).
 2. Audits the columns, row count, and missing values.
 3. Keeps only the `name` and `genre` columns needed by the app.
-4. Checks for duplicate titles. The repeated names (e.g. *Hamlet*, *Scream*) turned out to be distinct films, since they differ by release year, so no rows are removed.
+4. Checks for duplicate titles. Repeated names (e.g. *Hamlet*, *Scream*) are verified as distinct films that differ by release year, so no rows are removed.
 
 ---
 
@@ -58,19 +58,22 @@ The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from Ka
 - **csv** and **ast**: persistence and list deserialization
 
 ### Database
-- **CSV files**: `movies_updated.csv` (read-only movie dataset) and `users_data.csv` (auto-generated user accounts and personal lists)
+- **CSV files**: `data/movies_updated.csv` (read-only movie dataset) and `data/users_data.csv` (auto-generated user accounts and personal lists)
 
 ### DevOps / Tools
-- **Git** and **GitHub**: version control and collaboration
-- **Jupyter Notebook** (optional): the project was developed and documented in notebook form
+- **Git** and **GitHub**: version control, feature branching (`feature/portfolio-refactor`), and pull request code reviews
+- **Jupyter Notebook** (optional): the project was originally developed and documented in notebook form
 - **pip**: dependency management
 
 ---
 
 ## Process Automation (RPA)
+
 - **Engine:** Power Automate Desktop (PAD)
 - **Workflow:** `CineQuest-Catalog-Automation`
-- **Function:** Automates catalog status checks, execution logging, and UI analytics verification for the CineQuest desktop engine.
+- **Function:** Automates catalog status checks, execution logging, and UI analytics verification for the Cinequest desktop engine.
+
+![Power Automate Desktop workflow](assets/rpa-workflow.png)
 
 ---
 
@@ -83,8 +86,8 @@ The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from Ka
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/[YOUR_USERNAME]/cinequest-moviecatalog.git
-   cd cinequest-moviecatalog
+   git clone https://github.com/dimas-data/cinequest-app.git
+   cd cinequest-app
    ```
 
 2. **Create and activate a virtual environment** (recommended)
@@ -102,43 +105,52 @@ The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from Ka
 3. **Install dependencies**
 
    ```bash
-   pip install pandas
+   python -m pip install pandas
    ```
 
    > **Linux users:** if Tkinter is missing, install it with your package manager, e.g. `sudo apt install python3-tk`.
 
-4. **Add the dataset**
+4. **Verify the directory structure and dataset**
 
-   Download the movie dataset from Kaggle ([https://www.kaggle.com/code/yousefsaeedian/movies-dataset-visualization/input]) and place `movies_updated.csv` in the project root:
+   The dataset is included in the repository. If `movies_updated.csv` is missing, download it from [Kaggle](https://www.kaggle.com/code/yousefsaeedian/movies-dataset-visualization/input) and place it in `data/`. Your local files should be arranged as follows:
 
    ```text
-   cinequest-moviecatalog/
-   ├── movies_updated.csv
-   ├── [YOUR_SCRIPT_NAME].py
+   cinequest-app/
+   ├── assets/
+   │   └── rpa-workflow.png
+   ├── data/
+   │   ├── movies_updated.csv
+   │   └── users_data.csv        # auto-generated on first registration
+   ├── src/
+   │   └── finalGUI.py
+   ├── .gitignore
+   ├── LICENSE
    └── README.md
    ```
 
-5. **Configure environment variables**
+5. **Configure environment variables** (optional)
 
-   Cinequest runs fully offline and needs **no API keys or secrets**. If you fork the project and want to make file paths configurable, create a `.env` file in the project root:
+   Cinequest runs fully offline and needs **no API keys or secrets**. If you want configurable file paths, create a `.env` file in the project root:
 
-   ```bash
+   ```ini
    # .env (optional)
-   MOVIES_CSV_PATH=movies_updated.csv
-   USERS_CSV_PATH=users_data.csv
+   MOVIES_CSV_PATH=data/movies_updated.csv
+   USERS_CSV_PATH=data/users_data.csv
    ```
 
-   > `users_data.csv` contains account data (hashed passwords). Add it and `.env` to your `.gitignore`.
+   > `users_data.csv` contains account data (hashed passwords). Add it and `.env` to your `.gitignore` to keep credentials and user data local.
 
 ### Part 2: Running the App
 
-6. **Launch the GUI version**
+6. **Launch the desktop application**
+
+   Run the main script from the project root:
 
    ```bash
-   python [YOUR_SCRIPT_NAME].py
+   python src/finalGUI.py
    ```
 
-   Or, if you are working from the notebook:
+   Or, if you are working from the original notebook:
 
    ```bash
    jupyter notebook
@@ -146,7 +158,7 @@ The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from Ka
 
    Then open the notebook and run all cells in order.
 
-7. **Create an account**
+7. **Create an account and log in**
 
    Click **REGISTER**, choose a username and password, then return to the home screen and click **LOGIN**.
 
@@ -156,19 +168,19 @@ The project uses `movies_updated.csv` (4,000 rows × 15 columns, sourced from Ka
    - **My Personal List**: view and delete saved movies
    - **Browse Movies**: scroll the full catalog and add titles
    - **Search Movies**: search by name or genre
-   - **Trending Movies**: see the community Top 10
+   - **Trending Movies**: see the community Top 10 leaderboard
 
 9. **Find your data**
 
-   On first registration, the app creates `users_data.csv` in the working directory. Your account and personal list persist there between sessions.
+   On first registration, the app creates `data/users_data.csv`. Your account and personal list persist there between sessions.
 
 ---
 
 ## Contributing
 
-Contributions, issues, and feature suggestions are welcome. Fork the repo, create a feature branch, and open a pull request.
+Contributions, issues, and feature suggestions are welcome. Fork the repository, create a feature branch, and open a pull request.
 
 ## Legal & Licensing
 
-- **Disclaimer:** This project is for academic purposes and is **not affiliated** with Cinequest Inc. or any of its film festivals.
-- **License:** Licensed under the [MIT License](LICENSE).
+- **Disclaimer:** This project is for academic and portfolio demonstration purposes and is **not affiliated** with Cinequest Inc. or any of its film festivals.
+- **License:** Distributed under the [MIT License](LICENSE).
